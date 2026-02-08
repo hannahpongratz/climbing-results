@@ -82,7 +82,14 @@ def _process_chunk_age(ids_chunk, federation, ath_ids_series):
     opts.add_argument("--disable-gpu")
     opts.page_load_strategy = "eager"
 
-    driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=opts)
+    # FIX: On GitHub Ubuntu runners, Chrome is already installed.
+    # We don't need webdriver-manager inside the workers.
+    try:
+        driver = webdriver.Chrome(options=opts)
+    except Exception:
+        # Fallback for local testing if standard call fails
+        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=opts)
+
     results = []
     try:
         for ridx in ids_chunk:
@@ -155,6 +162,7 @@ def run_scraping_cycle(federation, n_workers=10):
 
 
 if __name__ == "__main__":
+    Service(ChromeDriverManager().install())
     parser = argparse.ArgumentParser()
     parser.add_argument("--fed", choices=['ifsc', 'dav'], required=True)
     args = parser.parse_args()
