@@ -1,0 +1,45 @@
+name: Daily Birthday Scraper
+
+on:
+  schedule:
+    # This runs every day at 08:00 UTC (approx. 3:00 AM EST / 9:00 AM CET)
+    - cron: '0 8 * * *'
+  workflow_dispatch: # This adds a "Run" button so you can test it manually
+
+jobs:
+  run-scraper:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # This spins up two parallel machines automatically
+        federation: [ifsc, dav]
+    
+    # Required to allow the Action to write/push changes back to your CSVs
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          pip install selenium webdriver-manager pandas numpy
+
+      - name: Run Scraper
+        # This uses the Matrix value to run the correct federation
+        run: python get_birthday.py --fed ${{ matrix.federation }}
+
+      - name: Commit and Push Changes
+        run: |
+          git config --global user.name "GitHub Action Bot"
+          git config --global user.email "actions@github.com"
+          git add .
+          # The 'exit 0' prevents the action from failing if there are no updates to the CSV
+          git commit -m "Automated update: ${{ matrix.federation }} results" || exit 0
+          git push
