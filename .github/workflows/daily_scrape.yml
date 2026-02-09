@@ -39,7 +39,16 @@ jobs:
         run: |
           git config --global user.name "GitHub Action Bot"
           git config --global user.email "actions@github.com"
+          
+          # 1. Stage the changes
           git add .
-          # The 'exit 0' prevents the action from failing if there are no updates to the CSV
+          
+          # 2. Only commit if there are actually changes
           git commit -m "Automated update: ${{ matrix.federation }} results" || exit 0
+          
+          # 3. Pull with rebase to handle the other worker's changes
+          # This 'merges' the DAV and IFSC results if they finish at the same time
+          git pull --rebase origin main
+          
+          # 4. Now push the combined result
           git push
