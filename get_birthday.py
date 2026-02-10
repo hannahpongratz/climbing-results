@@ -122,7 +122,7 @@ def run_scraping_cycle(federation, n_workers=10):
         ath_age[today_str] = np.nan
 
     # RE-DO LOGIC: Loop up to 5 times
-    for cycle in range(1, 6):
+    for cycle in range(1, 11):
         # Filter: (Age doesn't match Max Age) AND (Today's entry is still NaN)
         val = ath_age.iloc[:, 2]
         rowmax = ath_age.iloc[:, 3:].max(axis=1, skipna=True)
