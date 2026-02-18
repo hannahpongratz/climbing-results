@@ -3,7 +3,7 @@ name: Daily Birthday Scraper
 on:
   schedule:
     # This runs every day at 08:00 UTC (approx. 3:00 AM EST / 9:00 AM CET)
-    - cron: '0 8 * * *'
+    - cron: '0 6 * * *'
   workflow_dispatch: # This adds a "Run" button so you can test it manually
 
 jobs:
